@@ -90,11 +90,20 @@ def readInModelFile(fn):
 
             count += 1
 
+def getInputs():
+    optlist, args = getopt.getopt(sys.argv[1:], 'd:')
+    for o, a in optlist:
+        if o == "-d":
+            loadDataFromFile(a)
+
 def loadDataFromFile(fn):
     with open(fn, "rb") as f:
         csvFile = csv.reader(f)
         for line in csvFile:
             data.append(Instance(line[:(len(line) - 1)], line[-1]))
+
+def getDataInThisClasifier(classifier):
+    return [x for x in data if x.getClassifier() == classifier]
 
 def calPredictions():
     #Loop through each new data
@@ -123,16 +132,50 @@ def calPredictions():
         #Set the predicted classifier variable.
         item.setPredictedClassifier(classifiers[probMultiPrios.index(max(probMultiPrios))])
 
+def confusionMatrix():
+    matrix = [[0,0,0],[0,0,0],[0,0,0]]
+
+
+    for ind, classifier in enumerate(classifiers):
+        #print "IN"
+        #print classifier
+        #print getDataInThisClasifier(classifier)
+        for index, item in enumerate(getDataInThisClasifier(classifier)):
+            #print "IN"
+            #print item.getPredictedClassifier()
+            #print item.getClassifier()
+            if item.getPredictedClassifier() == item.getClassifier():
+                matrix[ind][classifiers.index(item.getPredictedClassifier())] += 1
+
+    return matrix
+
 if __name__ == "__main__":
     readInModelFile('naive_model.csv')
-    loadDataFromFile('Second50.csv')
-    print classifiers[0]
-    print priorProbabilities[0]
-    print means[0]
-    print covarianceMatrixes[0]
-
-    print "Doing calculations!"
+    getInputs()
+    #DEBUG STUFF:
+    #print classifiers[0]
+    #print priorProbabilities[0]
+    #print means[0]
+    #print covarianceMatrixes[0]
+    print ""
+    print ""
+    print "---------- Doing calculations! ---------- "
     calPredictions()
 
-    for x in data:
-        x.printPoint();
+    print "Length: " , len(data)
+    print ""
+    print ""
+    print "---------- Predicted Classification: ---------- "
+    for index, x in enumerate(data):
+        #x.printPoint()
+        print index , ") " , x.getPredictedClassifier()
+    print ""
+    print ""
+    print "---------- Confusion Matrix: ---------- "
+    print confusionMatrix()
+
+    print ""
+    print ""
+    print "---------- Percision, Accuracy, and F-Measure: ---------- "
+    for index, item in enumerate(classifiers):
+        pass

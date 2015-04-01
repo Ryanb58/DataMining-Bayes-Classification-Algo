@@ -38,6 +38,13 @@ class Instance:
     def printPoint(self):
         print "Classifier: "+ self.Classifier + " - Point : " + " - ".join(self.Points)
 
+def getInputs():
+    optlist, args = getopt.getopt(sys.argv[1:], 'd:')
+    for o, a in optlist:
+        if o == "-d":
+            fileName = a
+            loadDataFromFile(fileName)
+
 
 def readInModelFile(fn):
     with open(fn, "rb") as f:
@@ -112,11 +119,13 @@ def calPredictions():
 
 if __name__ == "__main__":
     readInModelFile('model.csv')
-    loadDataFromFile('Second50.csv')
+    getInputs()
+    #DEBUG Stuff:
     print classifiers
     print priorProbabilities
     print means
     print covarianceMatrixes
+
     calPredictions()
     for item in data:
         print "--"
