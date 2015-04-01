@@ -6,7 +6,7 @@ import timeit
 import csv
 import copy
 import getopt
-from scipy.stats import multivariate_normal
+import math
 
 data = []
 
@@ -63,7 +63,10 @@ def readInModelFile(fn):
                 covarianceCount += 4
             count += 1
 
-    #Now convert to the correct formats.
+        #Convert from string to int
+        #for index, x in enumerate(priorProbabilities):
+        #    priorProbabilities[index] = priorProbabilities[index])
+
 
 def loadDataFromFile(fn):
     with open(fn, "rb") as f:
@@ -72,17 +75,29 @@ def loadDataFromFile(fn):
             data.append(Instance(line[:(len(line) - 1)], line[-1]))
 
 def calPredictions():
-    #Loop through each
+    #Loop through each new data
     for index, item in enumerate(data):
         probMultiPrios = []
-        for classifier in classifiers:
-            probability = multivariate_normal.pdf(point, mean[index], covarianceMatrix[index])
-            probMultiPrios.append(priorProbabilities[index] * probability)
-        item.setPredictedClassifier(classifiers[probMultiPrios.index(max(probMultiPrios))])
+        #Loop through each classifier
+        for ind, classifier in enumerate(classifiers):
+            probs = []
+            #Loop through each dim in the 4dim point.
+            for id, point in enumerate(item.getPoints()):
+                #Do math stuff here.
+                print "point value:" + item.getPoints()
+                print " Standard Dev: " + covarianceMatrixes[ind][id][id]
+                probs.append( 1/(math.sqrt((2*math.pi))* math.sqrt(covarianceMatrixes[ind][id][id])) * math.exp(-((item.getPoints()[id] - means[ind])**2 / (2 * covarianceMatrixes[ind][id][id])**2)))
+                print probs
+
+        #item.setPredictedClassifier()
 
 if __name__ == "__main__":
-    readInModelFile('model.csv')
-    print classifiers
-    print priorProbabilities
-    print means
-    print covarianceMatrixes
+    readInModelFile('naive_model.csv')
+    readInModelFile('Last50.iris.csv')
+    print classifiers[0]
+    print priorProbabilities[0]
+    print means[0]
+    print covarianceMatrixes[0]
+
+    print "Doing calculations!"
+    calPredictions()

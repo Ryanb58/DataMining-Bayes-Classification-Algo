@@ -103,22 +103,25 @@ def covarianceMatrix(classifier):
     matrix = []
     #matrix = np.array(getDataInThisClasifier(classifier)).T
     #loop through each point in the classifier
+    #print getDataInThisClasifier(classifier)
     for point in getDataInThisClasifier(classifier):
         #Append each points to the matrix.
         matrix.append(point.getPoints())
     #Print this classifiers covariance matrix
-
+    #print np.array(matrix).T
     covarianceMatrix = np.cov(np.array(matrix, float).T)
 
     #Round to hundreths place
     for x in range(len(covarianceMatrix)):
         for y in range(len(covarianceMatrix[x])):
-            covarianceMatrix[x][y] = round(covarianceMatrix[x][y], 2)
-
+            if x == y:
+                covarianceMatrix[x][y] = round(covarianceMatrix[x][y], 2)
+            else:
+                covarianceMatrix[x][y] = 0.0
     return covarianceMatrix
 
 def saveModelFile():
-    with open('model.csv', 'wb') as fp:
+    with open('naive_model.csv', 'wb') as fp:
         a = csv.writer(fp, delimiter=',')
         for classifier in classifiers:
             a.writerow([classifier])
@@ -144,7 +147,7 @@ if __name__ == "__main__":
 
     for classifier in classifiers:
         print priorProbabilities(classifier)
-        print mean(classifier)[0]
+        print mean(classifier)
         print covarianceMatrix(classifier)
 
     saveModelFile()
