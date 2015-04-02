@@ -7,6 +7,7 @@ import csv
 import copy
 import getopt
 import math
+from scipy.stats import multivariate_normal
 
 data = []
 
@@ -112,17 +113,20 @@ def calPredictions():
         probMultiPrios = []
         for ind, classifier in enumerate(classifiers):
 
-            print classifier
-            print item.getPoints()
-            print means[ind]
-            print covarianceMatrixes[ind][ind]
-            probability = multivariate_normal.pdf(item.getPoints(), means[ind], covarianceMatrixes[ind][ind])
+            #print classifier
+            #print item.getPoints()
+            #print means[ind]
+            #print covarianceMatrixes[ind][ind]
+            #Calulate Likelyhood
+
+            probability = multivariate_normal.pdf(item.getPoints(), means[ind], covarianceMatrixes[ind][ind], True)
+            #Multiply by the priorprobability.
             probMultiPrios.append(priorProbabilities[ind] * probability)
+        #Get the max value from the array and set the predicted classifier for the item.
         item.setPredictedClassifier(classifiers[probMultiPrios.index(max(probMultiPrios))])
 
 def confusionMatrix():
     matrix = [[0,0,0],[0,0,0],[0,0,0]]
-
 
     for ind, classifier in enumerate(classifiers):
         #print "IN"
