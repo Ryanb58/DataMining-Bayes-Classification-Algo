@@ -6,7 +6,7 @@ import timeit
 import csv
 import copy
 import getopt
-from scipy.stats import multivariate_normal
+import math
 
 data = []
 
@@ -36,14 +36,8 @@ class Instance:
         self.PredictedClassifier = classifier
 
     def printPoint(self):
+        print "Predicted Classifier: " + self.PredictedClassifier
         print "Classifier: "+ self.Classifier + " - Point : " + " - ".join(self.Points)
-
-def getInputs():
-    optlist, args = getopt.getopt(sys.argv[1:], 'd:')
-    for o, a in optlist:
-        if o == "-d":
-            fileName = a
-            loadDataFromFile(fileName)
 
 
 def readInModelFile(fn):
@@ -96,6 +90,11 @@ def readInModelFile(fn):
 
             count += 1
 
+def getInputs():
+    optlist, args = getopt.getopt(sys.argv[1:], 'd:')
+    for o, a in optlist:
+        if o == "-d":
+            loadDataFromFile(a)
 
 def loadDataFromFile(fn):
     with open(fn, "rb") as f:
@@ -103,7 +102,11 @@ def loadDataFromFile(fn):
         for line in csvFile:
             data.append(Instance(line[:(len(line) - 1)], line[-1]))
 
+def getDataInThisClasifier(classifier):
+    return [x for x in data if x.getClassifier() == classifier]
+
 def calPredictions():
+
     #Loop through each
     for index, item in enumerate(data):
         probMultiPrios = []
@@ -117,16 +120,72 @@ def calPredictions():
             probMultiPrios.append(priorProbabilities[ind] * probability)
         item.setPredictedClassifier(classifiers[probMultiPrios.index(max(probMultiPrios))])
 
+def confusionMatrix():
+    matrix = [[0,0,0],[0,0,0],[0,0,0]]
+
+
+    for ind, classifier in enumerate(classifiers):
+        #print "IN"
+        #print classifier
+        #print getDataInThisClasifier(classifier)
+        for index, item in enumerate(getDataInThisClasifier(classifier)):
+            #print "IN"
+            #print item.getPredictedClassifier()
+            #print item.getClassifier()
+            #if item.getPredictedClassifier() == item.getClassifier():
+            matrix[ind][classifiers.index(item.getPredictedClassifier())] += 1
+
+    return matrix
+
 if __name__ == "__main__":
     readInModelFile('model.csv')
     getInputs()
-    #DEBUG Stuff:
-    print classifiers
-    print priorProbabilities
-    print means
-    print covarianceMatrixes
-
+    #DEBUG STUFF:
+    #print classifiers[0]
+    #print priorProbabilities[0]
+    #print means[0]
+    #print covarianceMatrixes[0]
+    print ""
+    print ""
+    print "---------- Doing calculations! ---------- "
     calPredictions()
-    for item in data:
-        print "--"
-        print item.getPredictedClassifier()
+
+    print "Length: " , len(data)
+    print ""
+    print ""
+    print "---------- Predicted Classification: ---------- "
+    for index, x in enumerate(data):
+        #x.printPoint()
+        print index , ") " , x.getPredictedClassifier()
+    print ""
+    print ""
+    print "---------- Confusion Matrix: ---------- "
+    confusMatrix = confusionMatrix()
+    print confusMatrix
+
+    print ""
+    print ""
+    print "---------- Percision, Accuracy, and F-Measure: ---------- "
+    for index, classifier in enumerate(classifiers):
+        print classifier , ":"
+        print ""
+
+        #Max of row / total of row
+        #print max(confusMatrix[index])
+        #print sum(confusMatrix[index])
+        recal = round(((max(confusMatrix[index]) + 0.0) / (sum(confusMatrix[index]) + 0.0)), 2)
+        print "Recal: " , recal
+
+        #Max of column / total of column
+        #print confusMatrix
+        #Transpose the confusion matrix
+        matrxForPrecision = np.array(confusMatrix).T
+        #print matrxForPrecision
+        precision = round(((max(matrxForPrecision[index]) + 0.0) / (sum(matrxForPrecision[index]) + 0.0)), 2)
+        print "Precision: " , precision
+
+
+        fmeasure = round(((precision * recal)/(2*(precision+recal))), 2)
+        print "F-Measure: " , fmeasure
+
+        print ""

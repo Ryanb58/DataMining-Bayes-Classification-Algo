@@ -142,8 +142,8 @@ def confusionMatrix():
         #print getDataInThisClasifier(classifier)
         for index, item in enumerate(getDataInThisClasifier(classifier)):
             #print "IN"
-            print item.getPredictedClassifier()
-            print item.getClassifier()
+            #print item.getPredictedClassifier()
+            #print item.getClassifier()
             #if item.getPredictedClassifier() == item.getClassifier():
             matrix[ind][classifiers.index(item.getPredictedClassifier())] += 1
 
