@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
     print ""
     print ""
-    print "---------- Percision, Accuracy, and F-Measure: ---------- "
+    print "---------- Precision, Accuracy, and F-Measure: ---------- "
     for index, classifier in enumerate(classifiers):
         print classifier , ":"
         print ""
