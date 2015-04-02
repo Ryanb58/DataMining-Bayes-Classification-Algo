@@ -142,10 +142,10 @@ def confusionMatrix():
         #print getDataInThisClasifier(classifier)
         for index, item in enumerate(getDataInThisClasifier(classifier)):
             #print "IN"
-            #print item.getPredictedClassifier()
-            #print item.getClassifier()
-            if item.getPredictedClassifier() == item.getClassifier():
-                matrix[ind][classifiers.index(item.getPredictedClassifier())] += 1
+            print item.getPredictedClassifier()
+            print item.getClassifier()
+            #if item.getPredictedClassifier() == item.getClassifier():
+            matrix[ind][classifiers.index(item.getPredictedClassifier())] += 1
 
     return matrix
 
@@ -172,10 +172,32 @@ if __name__ == "__main__":
     print ""
     print ""
     print "---------- Confusion Matrix: ---------- "
-    print confusionMatrix()
+    confusMatrix = confusionMatrix()
+    print confusMatrix
 
     print ""
     print ""
     print "---------- Percision, Accuracy, and F-Measure: ---------- "
-    for index, item in enumerate(classifiers):
-        pass
+    for index, classifier in enumerate(classifiers):
+        print classifier , ":"
+        print ""
+
+        #Max of row / total of row
+        #print max(confusMatrix[index])
+        #print sum(confusMatrix[index])
+        recal = round(((max(confusMatrix[index]) + 0.0) / (sum(confusMatrix[index]) + 0.0)), 2)
+        print "Recal: " , recal
+
+        #Max of column / total of column
+        #print confusMatrix
+        #Transpose the confusion matrix
+        matrxForPrecision = np.array(confusMatrix).T
+        #print matrxForPrecision
+        precision = round(((max(matrxForPrecision[index]) + 0.0) / (sum(matrxForPrecision[index]) + 0.0)), 2)
+        print "Precision: " , precision
+
+
+        fmeasure = round(((precision * recal)/(2*(precision+recal))), 2)
+        print "F-Measure: " , fmeasure
+
+        print ""
